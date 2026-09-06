@@ -8,7 +8,9 @@ result in a complete HTML document, and writes the small handful of files a
 static host needs. The output in docs/ is the whole website; docs/index.html
 also opens fine by double-clicking it.
 """
-import hashlib, json, os, shutil
+import hashlib, json, os, re, shutil
+
+from pypdf import PdfReader, PdfWriter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # GitHub Pages publishes straight from this folder: repo Settings -> Pages ->
@@ -19,37 +21,70 @@ TITLE = "RAS Prelims Drill Room"
 DESC  = ("5,395 practice questions for the RAS Prelims 2026, across 111 chapters "
          "in 12 subjects, with full-length mocks scored the way RPSC scores them.")
 
-# The two PDF folders are named by subject: RASNotes_<CODE>_... and RAS2026_<CODE>_...
-PDF_SETS = [("Handwritten Notes", "RASNotes_", "notes", "Handwritten notes"),
-            ("Question Bank",     "RAS2026_",  "bank",  "Question bank")]
+NOTES_DIR = os.path.join(HERE, "Handwritten Notes")
+PDF_OUT   = os.path.join("pdf")          # relative to SITE, and to the page
 
-def collect_pdfs():
-    """Map subject code -> [{kind, file, href, mb}], plus the list of files to copy."""
-    docs, files = {}, []
-    for folder, prefix, slug, label in PDF_SETS:
-        src = os.path.join(HERE, folder)
-        if not os.path.isdir(src):
+_norm = lambda t: "".join((t or "").split())   # collapse the letter-spacing the notes are typeset with
+
+def split_notes(bank):
+    """Cut each subject's notes PDF into one PDF per chapter.
+
+    The notes are a single file per subject, but the app lists chapters, and a
+    chapter is what someone actually wants to read. Page anchors (#page=N) are
+    ignored by most phone PDF viewers, so each chapter gets its own file: it
+    opens reliably, and it is ~200 KB rather than the ~2.5 MB of a whole subject.
+
+    A chapter starts on the page whose text begins with its code — "RH01..." —
+    which is how the notes are typeset. Returns {chapterCode: {href, pages, kb}}.
+    """
+    if not os.path.isdir(NOTES_DIR):
+        return {}, set()
+
+    by_code = {s["code"]: s["chapters"] for s in bank["subjects"]}
+    docs, produced = {}, set()
+
+    for name in sorted(os.listdir(NOTES_DIR)):
+        if not (name.startswith("RASNotes_") and name.lower().endswith(".pdf")):
             continue
-        for name in sorted(os.listdir(src)):
-            if not (name.startswith(prefix) and name.lower().endswith(".pdf")):
-                continue
-            code = name[len(prefix):len(prefix) + 2]
-            path = os.path.join(src, name)
-            docs.setdefault(code, []).append({
-                "kind": label,
-                "file": name,
-                "href": f"pdf/{slug}/{name}",
-                "mb": f"{os.path.getsize(path) / 1e6:.1f}",
-            })
-            files.append((path, os.path.join(SITE, "pdf", slug, name)))
-    order = [label for *_, label in PDF_SETS]        # notes before question bank
-    for code in docs:
-        docs[code].sort(key=lambda d: order.index(d["kind"]))
-    return docs, files
+        subject = name[len("RASNotes_"):][:2]
+        chapters = [c["code"] for c in by_code.get(subject, [])]
+        if not chapters:
+            continue
+
+        src = os.path.join(NOTES_DIR, name)
+        reader = PdfReader(src)
+
+        starts = {}
+        for i, page in enumerate(reader.pages):
+            head = _norm(page.extract_text())
+            for ch in chapters:
+                if ch not in starts and head.startswith(ch):
+                    starts[ch] = i
+        missing = [c for c in chapters if c not in starts]
+        if missing:
+            print(f"  ! {subject}: no start page found for {', '.join(missing)} — skipped")
+
+        found = sorted(starts.items(), key=lambda kv: kv[1])
+        for n, (ch, first) in enumerate(found):
+            last = found[n + 1][1] if n + 1 < len(found) else len(reader.pages)
+            rel = f"{PDF_OUT}/{subject}/{ch}.pdf"
+            dst = os.path.join(SITE, rel.replace("/", os.sep))
+            produced.add(os.path.normpath(dst))
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            if not (os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src)):
+                w = PdfWriter()
+                for page in reader.pages[first:last]:
+                    w.add_page(page)
+                with open(dst, "wb") as fh:
+                    w.write(fh)
+            docs[ch] = {"href": rel,
+                        "pages": last - first,
+                        "kb": round(os.path.getsize(dst) / 1024)}
+    return docs, produced
 
 tpl  = open(os.path.join(HERE, "app_template.html"), encoding="utf-8").read()
 bank = json.load(open(os.path.join(HERE, "bank.json"), encoding="utf-8"))
-docs, pdf_files = collect_pdfs()
+docs, wanted = split_notes(bank)
 
 # "</" must be escaped or a "</script>" inside any question string would close the tag early
 payload = json.dumps(bank, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
@@ -116,15 +151,20 @@ open(os.path.join(SITE, "manifest.webmanifest"), "w", encoding="utf-8").write(js
 for f in os.listdir(os.path.join(HERE, "assets")):
     shutil.copy2(os.path.join(HERE, "assets", f), os.path.join(SITE, f))
 
-# ~34 MB of PDFs: only copy the ones that actually changed, so a rebuild stays quick
-copied = 0
-for src, dst in pdf_files:
-    os.makedirs(os.path.dirname(dst), exist_ok=True)
-    if (not os.path.exists(dst)
-            or os.path.getsize(dst) != os.path.getsize(src)
-            or os.path.getmtime(dst) < os.path.getmtime(src)):
-        shutil.copy2(src, dst)
-        copied += 1
+# Drop anything left over from an earlier build — renamed chapters, the old
+# question-bank folder — so docs/ only ever holds what this build produced.
+# Guarded: with the notes folder missing there is nothing to prune *against*,
+# and pruning would silently delete every chapter PDF the site is serving.
+pdf_root = os.path.join(SITE, PDF_OUT)
+for root, _, files in (os.walk(pdf_root, topdown=False) if wanted else []):
+    for f in files:
+        path = os.path.normpath(os.path.join(root, f))
+        if path not in wanted:
+            os.remove(path)
+    if not os.listdir(root):
+        os.rmdir(root)
+if not wanted:
+    print("  ! 'Handwritten Notes' not found — left docs/pdf/ untouched")
 
 # GitHub Pages runs Jekyll otherwise, which strips files it does not recognise
 open(os.path.join(SITE, ".nojekyll"), "w").close()
@@ -133,4 +173,4 @@ n = sum(len(c["questions"]) for s in bank["subjects"] for c in s["chapters"])
 mb = sum(os.path.getsize(os.path.join(r, f))
          for r, _, fs in os.walk(SITE) for f in fs) / 1e6
 print(f"built {SITE}{os.sep}  —  {n} questions, index.html {os.path.getsize(index)/1e6:.2f} MB, "
-      f"{len(pdf_files)} PDFs ({copied} copied), site {mb:.1f} MB, cache {ver}")
+      f"{len(docs)} chapter PDFs, site {mb:.1f} MB, cache {ver}")

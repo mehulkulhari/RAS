@@ -26,7 +26,7 @@ the **repo** scope → copy it, and paste that as the password.
 If you would rather not deal with tokens: install [GitHub Desktop](https://desktop.github.com),
 choose *Add → Add Existing Repository*, point it at this folder, and press *Publish*.
 
-The push moves roughly 45 MB, so give it a minute.
+The push moves about 27 MB, so give it a minute.
 
 **3. Turn Pages on.** In the repo: **Settings → Pages**. Under *Build and deployment*
 set **Source** to `Deploy from a branch`, **Branch** to `main`, and the folder to

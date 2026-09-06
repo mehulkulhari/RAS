@@ -1,8 +1,8 @@
 # RAS Prelims 2026 — Practice site
 
 5,395 questions across 111 chapters in 12 subjects, full-length mocks scored the way
-RPSC scores them, chapter fact sheets, and the 24 notes and question-bank PDFs.
-One page, no framework, no server. Works offline once loaded.
+RPSC scores them, chapter fact sheets, and the handwritten class notes split into one
+PDF per chapter. One page, no framework, no server. Works offline once loaded.
 
 ## The website
 
@@ -22,7 +22,8 @@ setup and how to push an update.
 | `bank.json` | **The data.** 5,395 questions, 3.5 MB. |
 | `sw_template.js` | The offline cache. `__VER__` is filled in per build. |
 | `assets/` | Icons — the tab favicon, the home-screen icons, the maskable Android one. |
-| `Handwritten Notes/`, `Question Bank/` | The 24 source PDFs, copied into `docs/pdf/` at build time. |
+| `Handwritten Notes/` | The 12 source PDFs, one per subject. `build.py` cuts these into per-chapter files. |
+| `Question Bank/` | Not used by the site — the practice questions come from `bank.json`. Kept as reference. |
 | `build.py` | Assembles all of the above into `docs/`. |
 | `docs/` | **The built site.** Everything a host needs and nothing it does not. |
 
@@ -30,9 +31,13 @@ setup and how to push an update.
 
     python build.py
 
+Needs `pypdf` — `pip install pypdf` — to cut the notes into chapters. That step reads
+every page of every notes PDF, so a full build takes a couple of minutes; chapter files
+already present and newer than their source are left alone, so later builds are quick.
+
 Edit `app_template.html` to change how it looks or behaves, `bank.json` to change
-questions, or drop a PDF into either PDF folder to add one — then run the script. It
-rewrites `docs/`, copying only the PDFs that actually changed.
+questions, or replace a PDF in `Handwritten Notes/` to update notes — then run the
+script. It rewrites `docs/`.
 
 Commit and push afterwards, or the live site keeps serving the old build.
 
@@ -69,8 +74,22 @@ To add a question, append an object to any chapter's `questions` array and rerun
 `build.py`. `id` only needs to be unique — the app uses it as the key for saved
 progress, so avoid renumbering existing questions or you will orphan saved answers.
 
-The PDFs need no configuration. `build.py` reads the subject code out of each filename
-(`RASNotes_RH_...`, `RAS2026_RH_...`) and files it under that subject in the Notes tab.
+## How the notes are split
+
+Each file in `Handwritten Notes/` covers a whole subject, but the Notes tab lists
+chapters, because a chapter is what someone actually sits down to read.
+
+`build.py` finds where each chapter starts by looking for the page whose text begins
+with the chapter's code — the notes are typeset with `RH01` as the heading of the page
+that opens that chapter — and writes pages up to the next chapter's start as
+`docs/pdf/RH/RH01.pdf`. All 111 chapters are found this way; if one ever isn't, the
+build says so by name and skips it rather than producing a wrong file.
+
+Splitting rather than linking to `#page=` matters on a phone: most mobile PDF viewers
+ignore page anchors, and a chapter file is ~300 KB against ~2.5 MB for a whole subject.
+The cost is that each chapter re-embeds the notes' fonts, so the split set is about 1.5x
+the size of the originals on disk. Nobody downloads more than one chapter at a time,
+so that trade is worth it.
 
 ## How the app is put together
 
@@ -106,7 +125,8 @@ The PDFs need no configuration. `build.py` reads the subject code out of each fi
 - **The site is public.** Anyone with the URL can read every question and download every
   PDF. Don't put anything in it you would not hand to a stranger.
 - **It works offline.** A service worker caches the page and its fonts on the first visit,
-  so afterwards it opens with no signal and costs no data. The PDFs are deliberately left
-  out of that cache — 34 MB is too much to put on someone's phone without asking.
+  so afterwards it opens with no signal and costs no data. The chapter PDFs are deliberately
+  left out of that cache — 39 MB is too much to put on someone's phone without asking — so
+  reading notes needs a connection, while the questions do not.
 - An update reaches a phone on the *second* launch after you push: the first fetches the
   new version in the background, the next one runs it.

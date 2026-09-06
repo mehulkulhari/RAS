@@ -4,7 +4,7 @@
    expensive on mobile data. It is cached on the first visit and served from the
    phone after that. VER changes on every build, which is what evicts the old copy:
    the new worker installs in the background and takes over on the next launch. */
-const VER = "ras-108f21f9834d";
+const VER = "ras-2d8651970518";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg",
                "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 

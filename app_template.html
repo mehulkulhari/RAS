@@ -147,18 +147,22 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
 .facts li:last-child{border-bottom:none}
 .facts li::marker{font-family:var(--mono);font-size:11px;color:var(--muted)}
 
-.docs{display:flex;flex-direction:column;gap:14px}
+.docs{display:flex;flex-direction:column;gap:10px}
 .docsub{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
-.docsub-h{display:flex;align-items:center;gap:9px;padding:10px 16px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
-.docsub-h .code{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--indigo);background:var(--indigo-soft);border-radius:3px;padding:2px 5px;min-width:29px;text-align:center}
-.docsub-h .nm{font-size:13.5px;font-weight:600;line-height:1.3}
-.doc{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line-soft);color:inherit;text-decoration:none}
-.doc:first-of-type{border-top:none}
-.doc:hover{background:var(--surface-2)}
-.doc .ic{width:26px;height:26px;flex:none;border-radius:5px;display:grid;place-items:center;font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.02em;border:1px solid var(--line);color:var(--muted)}
-.doc .kd{flex:1;min-width:0;font-size:14px;line-height:1.35}
-.doc .kd small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.doc .sz{flex:none;white-space:nowrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.docsub-h{width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;text-align:left}
+.docsub-h:hover{background:var(--surface-2)}
+.docsub-h .code{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--indigo);background:var(--indigo-soft);border-radius:3px;padding:2px 5px;min-width:29px;text-align:center;flex:none}
+.docsub-h .nm{flex:1;min-width:0;font-size:14.5px;font-weight:600;line-height:1.3}
+.docsub-h .ct{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.docsub-h .caret{flex:none;color:var(--muted);font-size:11px;transition:transform .15s;transform:rotate(0)}
+.docsub-h[aria-expanded="true"]{background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
+.docsub-h[aria-expanded="true"] .caret{transform:rotate(90deg)}
+.doc{display:flex;align-items:center;gap:11px;padding:11px 16px 11px 18px;border-top:1px solid var(--line-soft);color:inherit;text-decoration:none}
+.doc:first-child{border-top:none}
+.doc:hover{background:var(--indigo-soft)}
+.doc .cc{font-family:var(--mono);font-size:10px;color:var(--muted);flex:none;min-width:34px}
+.doc .kd{flex:1;min-width:0;font-size:14px;line-height:1.4}
+.doc .pp{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none;white-space:nowrap;font-variant-numeric:tabular-nums}
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty p{font-size:14px;margin:8px 0 0}
 .note{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.55}
@@ -509,29 +513,46 @@ function renderFacts(){
 }
 
 /* ---------- notes ---------- */
+let openSub = BANK.subjects[0].code;      // one subject open at rest, so the tab shows what it does
+
 function renderNotes(){
-  const groups = BANK.subjects.map(s => [s, DOCS[s.code] || []]).filter(([,d]) => d.length);
-  const total = groups.reduce((a,[,d]) => a + d.length, 0);
+  const have = s => s.chapters.filter(c => DOCS[c.code]);
+  const groups = BANK.subjects.map(s => [s, have(s)]).filter(([,cs]) => cs.length);
+  const total = groups.reduce((a,[,cs]) => a + cs.length, 0);
   if (!total){
     $("#view").innerHTML = `<div class="crumb">Reference</div><h2 class="h2">Notes</h2>
-      <div class="empty"><strong>No PDFs bundled.</strong><p>Run build.py with the PDF folders in place.</p></div>`;
+      <div class="empty"><strong>No notes bundled.</strong>
+        <p>Run build.py with the Handwritten Notes folder in place.</p></div>`;
     return;
   }
-  $("#view").innerHTML = `<div class="crumb">Reference</div>
-    <h2 class="h2">Notes &amp; question banks</h2>
-    <p class="sub">${total} PDFs, one pair per subject. They open in your phone's PDF reader.</p>
-    <div class="docs">${groups.map(([s,docs]) => `
-      <section class="docsub">
-        <div class="docsub-h"><span class="code">${s.code}</span><span class="nm">${esc(s.subject)}</span></div>
-        ${docs.map(d => `<a class="doc" href="${encodeURI(d.href)}" target="_blank" rel="noopener">
-          <span class="ic">PDF</span>
-          <span class="kd">${esc(d.kind)}<small>${esc(d.file)}</small></span>
-          <span class="sz">${d.mb} MB</span>
-        </a>`).join("")}
-      </section>`).join("")}</div>
-    <p class="note">These are downloaded fresh each time rather than stored on the device — all
-      ${groups.reduce((a,[,d])=>a+d.reduce((x,y)=>x+ +y.mb,0),0).toFixed(0)} MB of them would be a lot to keep offline.
-      The practice questions themselves work with no signal.</p>`;
+  $("#view").innerHTML = `<div class="crumb">Handwritten class notes</div>
+    <h2 class="h2">Notes by chapter</h2>
+    <p class="sub">${total} chapters across ${groups.length} subjects. Pick a subject, then a chapter.</p>
+    <div class="docs">${groups.map(([s,cs]) => {
+      const open = s.code === openSub;
+      return `<section class="docsub">
+        <button class="docsub-h" data-s="${s.code}" aria-expanded="${open}">
+          <span class="code">${s.code}</span>
+          <span class="nm">${esc(s.subject)}</span>
+          <span class="ct">${cs.length}</span>
+          <span class="caret">&#9656;</span>
+        </button>
+        <div class="docch" ${open?"":"hidden"}>${cs.map(c => {
+          const d = DOCS[c.code];
+          return `<a class="doc" href="${encodeURI(d.href)}" target="_blank" rel="noopener">
+            <span class="cc">${c.code}</span>
+            <span class="kd">${esc(c.title)}</span>
+            <span class="pp">${d.pages} pp</span>
+          </a>`;}).join("")}</div>
+      </section>`;}).join("")}</div>
+    <p class="note">Each chapter is its own PDF, a few hundred kilobytes, so it opens
+      quickly on mobile data. They are fetched when you tap them rather than stored on
+      the device — the practice questions are what works offline.</p>`;
+
+  $("#view").querySelectorAll("[data-s]").forEach(b => b.onclick = () => {
+    openSub = b.getAttribute("aria-expanded") === "true" ? null : b.dataset.s;
+    renderNotes();
+  });
 }
 
 /* ---------- routing ---------- */
