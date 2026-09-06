@@ -86,8 +86,8 @@ that opens that chapter — and writes pages up to the next chapter's start as
 build says so by name and skips it rather than producing a wrong file.
 
 Splitting rather than linking to `#page=` matters on a phone: most mobile PDF viewers
-ignore page anchors, and a chapter file is ~300 KB against ~2.5 MB for a whole subject.
-The cost is that each chapter re-embeds the notes' fonts, so the split set is about 1.5x
+ignore page anchors, and a chapter file is ~400 KB against ~3 MB for a whole subject.
+The cost is that each chapter re-embeds the notes' fonts, so the split set is about 1.4x
 the size of the originals on disk. Nobody downloads more than one chapter at a time,
 so that trade is worth it.
 
@@ -126,7 +126,7 @@ so that trade is worth it.
   PDF. Don't put anything in it you would not hand to a stranger.
 - **It works offline.** A service worker caches the page and its fonts on the first visit,
   so afterwards it opens with no signal and costs no data. The chapter PDFs are deliberately
-  left out of that cache — 39 MB is too much to put on someone's phone without asking — so
+  left out of that cache — 51 MB is too much to put on someone's phone without asking — so
   reading notes needs a connection, while the questions do not.
 - An update reaches a phone on the *second* launch after you push: the first fetches the
   new version in the background, the next one runs it.
