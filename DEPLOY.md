@@ -26,7 +26,7 @@ the **repo** scope → copy it, and paste that as the password.
 If you would rather not deal with tokens: install [GitHub Desktop](https://desktop.github.com),
 choose *Add → Add Existing Repository*, point it at this folder, and press *Publish*.
 
-The push moves about 27 MB, so give it a minute.
+The push moves about 55 MB — the notes make up most of it — so give it a few minutes.
 
 **3. Turn Pages on.** In the repo: **Settings → Pages**. Under *Build and deployment*
 set **Source** to `Deploy from a branch`, **Branch** to `main`, and the folder to
@@ -64,8 +64,8 @@ Run `git pull --rebase origin main`, then push again.
 **Pages says "There isn't a GitHub Pages site here".** Normal for the first few minutes
 after the first deploy. Give it five.
 
-**404 on the PDFs.** Check they were committed — `git ls-files docs/pdf` should list 24
-files.
+**404 on the notes.** Check they were committed — `git ls-files docs/pdf` should list
+111 files, one per chapter.
 
 **An old version keeps loading on the phone.** That is the offline cache doing its job.
 Launch it twice, or pull down to refresh.
