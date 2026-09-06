@@ -108,6 +108,8 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
 .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .opt.wrong .lt{color:var(--bad)}
 .opt.picked{box-shadow:inset 0 0 0 1px currentColor}
+.opt.sel{border-color:var(--indigo);background:var(--indigo-soft)}
+.opt.sel .lt{color:var(--indigo)}
 .exp{margin:0 18px 18px;padding:13px 15px;border-left:3px solid var(--indigo);background:var(--indigo-soft);border-radius:0 7px 7px 0;font-size:14px;line-height:1.6;color:var(--ink-2)}
 .exp .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--indigo);display:block;margin-bottom:4px;font-weight:600}
 .qfoot{display:flex;gap:9px;align-items:center;padding:13px 18px;border-top:1px solid var(--line-soft);flex-wrap:wrap}
@@ -338,7 +340,7 @@ function renderPractice(){
         <span class="tag d-${q.diff}">${({E:"Easy",M:"Moderate",H:"Hard"})[q.diff]}</span>
         ${q.pyq?`<span class="tag pyq">${esc(q.pyq)}</span>`:""}
         ${q.repeat?`<span class="tag rep">Repeat</span>`:""}
-        ${(q.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}
+        ${revealed ? (q.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("") : ""}   <!-- tags name the topic, which for ~38% of questions IS the answer: only after the pick -->
         <span class="spacer tally">Session <b class="ok">${sess.ok}</b> · <b class="bad">${sess.bad}</b></span>
       </div>
       <div class="qbody"><p class="stem">${esc(q.q)}</p></div>
@@ -431,7 +433,7 @@ function renderMock(){
         <span class="tag">${q.ch}</span>
         <span class="spacer tally">${MARK.toFixed(2)} marks · −${PEN.toFixed(2)} if wrong</span></div>
       <div class="qbody"><p class="stem">${esc(q.q)}</p></div>
-      <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${chosen===i?"picked correct":""}" data-o="${i}">
+      <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${chosen===i?"sel":""}" data-o="${i}">
         <span class="lt">${LET[i]}</span><span class="tx">${esc(o)}</span></button>`).join("")}</div>
       <div class="qfoot">
         <button class="btn" id="mprev" ${m.i===0?"disabled":""}>← Previous</button>
