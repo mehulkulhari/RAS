@@ -1,0 +1,578 @@
+<title>RAS Prelims Drill Room</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F5F6F8; --surface:#FFFFFF; --surface-2:#EEF0F5;
+  --ink:#151A22; --ink-2:#39414F; --muted:#5B6478;
+  --indigo:#2B3F8F; --indigo-soft:#E7EAF6; --indigo-line:#B9C2E4;
+  --line:#DEE2EA; --line-soft:#E9ECF2;
+  --ok:#146B47; --ok-bg:#E4F2EA; --bad:#A32218; --bad-bg:#FAE7E5; --skip:#8A6100; --skip-bg:#FBF1DC;
+  --shadow:0 1px 2px rgba(21,26,34,.06),0 8px 24px -12px rgba(21,26,34,.18);
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --rail:288px; --mh:54px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#10131A; --surface:#171B24; --surface-2:#1E232E;
+  --ink:#E8EBF2; --ink-2:#C3CAD8; --muted:#9AA3B7;
+  --indigo:#8296F0; --indigo-soft:#1D2540; --indigo-line:#3A4675;
+  --line:#262C38; --line-soft:#20252F;
+  --ok:#5FC896; --ok-bg:#14301F; --bad:#F0847A; --bad-bg:#361A18; --skip:#E0AC3C; --skip-bg:#31260F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}}
+:root[data-theme="dark"]{
+  --paper:#10131A; --surface:#171B24; --surface-2:#1E232E;
+  --ink:#E8EBF2; --ink-2:#C3CAD8; --muted:#9AA3B7;
+  --indigo:#8296F0; --indigo-soft:#1D2540; --indigo-line:#3A4675;
+  --line:#262C38; --line-soft:#20252F;
+  --ok:#5FC896; --ok-bg:#14301F; --bad:#F0847A; --bad-bg:#361A18; --skip:#E0AC3C; --skip-bg:#31260F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30}
+.mast-in{display:flex;align-items:center;gap:20px;padding:11px 20px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand h1{font-family:var(--serif);font-weight:600;font-size:18px;margin:0;letter-spacing:-.01em}
+.brand .stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--indigo);border:1px solid var(--indigo-line);background:var(--indigo-soft);padding:2px 7px;border-radius:3px;white-space:nowrap}
+.modes{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:7px}
+.modes button{padding:6px 14px;border-radius:5px;font-size:13.5px;font-weight:500;color:var(--muted)}
+.modes button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.countdown{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.35}
+.countdown b{display:block;font-size:19px;color:var(--ink);font-weight:600}
+.icobtn{width:32px;height:32px;border-radius:6px;display:grid;place-items:center;color:var(--muted);border:1px solid var(--line)}
+.icobtn:hover{color:var(--ink);background:var(--surface-2)}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);min-height:calc(100vh - var(--mh));min-height:calc(100dvh - var(--mh))}
+.rail{border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;max-height:calc(100vh - var(--mh));max-height:calc(100dvh - var(--mh));position:sticky;top:var(--mh)}
+.rail-head{padding:14px 16px 10px;border-bottom:1px solid var(--line-soft)}
+.rail-head .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--muted)}
+.overall{display:flex;align-items:baseline;gap:8px;margin-top:5px}
+.overall b{font-family:var(--mono);font-size:22px;font-weight:600}
+.overall span{font-size:12.5px;color:var(--muted)}
+.bar{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--indigo);border-radius:2px}
+.subj{border-bottom:1px solid var(--line-soft)}
+.subj>button{width:100%;display:flex;align-items:center;gap:9px;padding:9px 16px;text-align:left}
+.subj>button:hover{background:var(--surface-2)}
+.subj .code{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--indigo);background:var(--indigo-soft);border-radius:3px;padding:2px 5px;min-width:29px;text-align:center}
+.subj .nm{flex:1;font-size:13.5px;font-weight:500;line-height:1.3}
+.subj .ct{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chaps{padding:0 0 8px}
+.chap{width:100%;display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:6px 16px 6px 18px;text-align:left}
+.chap:hover{background:var(--surface-2)}
+.chap[aria-current="true"]{background:var(--indigo-soft)}
+.chap .cc{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.chap .ct2{font-size:12.5px;color:var(--ink-2);line-height:1.35}
+.chap .pg{font-family:var(--mono);font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chap .minibar{grid-column:2/4;height:3px;border-radius:2px;background:var(--surface-2);overflow:hidden}
+.chap .minibar i{display:block;height:100%;background:var(--ok)}
+
+/* ---------- work area ---------- */
+.work{padding:26px 28px 80px;min-width:0}
+.col{max-width:760px;margin:0 auto}
+.crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{font-size:12.5px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.chip[aria-pressed="true"]{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-soft);font-weight:500}
+
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.qtop{display:flex;align-items:center;gap:9px;padding:11px 18px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.qnum{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;border:1px solid var(--line);color:var(--muted)}
+.tag.pyq{border-color:var(--indigo-line);background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+.tag.rep{border-color:var(--skip);color:var(--skip);background:var(--skip-bg);font-weight:600}
+.tag.d-E{color:var(--ok);border-color:var(--ok)}
+.tag.d-M{color:var(--skip);border-color:var(--skip)}
+.tag.d-H{color:var(--bad);border-color:var(--bad)}
+.qbody{padding:20px 18px 6px}
+.stem{font-family:var(--serif);font-size:17px;line-height:1.62;white-space:pre-wrap;margin:0 0 16px}
+.opts{display:flex;flex-direction:column;gap:7px;padding:0 18px 16px}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:var(--surface);transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--indigo-line);background:var(--indigo-soft)}
+.opt:disabled{cursor:default}
+.opt .lt{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);width:17px;flex:none;padding-top:2px}
+.opt .tx{flex:1;font-size:14.5px;line-height:1.5;white-space:pre-wrap}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+.opt.correct .lt{color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.wrong .lt{color:var(--bad)}
+.opt.picked{box-shadow:inset 0 0 0 1px currentColor}
+.exp{margin:0 18px 18px;padding:13px 15px;border-left:3px solid var(--indigo);background:var(--indigo-soft);border-radius:0 7px 7px 0;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.exp .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--indigo);display:block;margin-bottom:4px;font-weight:600}
+.qfoot{display:flex;gap:9px;align-items:center;padding:13px 18px;border-top:1px solid var(--line-soft);flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:7px;font-size:13.5px;font-weight:500;border:1px solid var(--line);background:var(--surface)}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:default}
+.spacer{margin-left:auto}
+.tally{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tally b.ok{color:var(--ok)} .tally b.bad{color:var(--bad)}
+
+/* ---------- mock ---------- */
+.mockbar{display:flex;align-items:center;gap:14px;padding:11px 16px;background:var(--surface);border:1px solid var(--line);border-radius:9px;margin-bottom:16px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.clock{font-family:var(--mono);font-size:21px;font-weight:600;font-variant-numeric:tabular-nums}
+.clock.low{color:var(--bad)}
+.mockbar .meta{font-size:12px;color:var(--muted);line-height:1.35}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:5px;margin-top:14px}
+.pal{aspect-ratio:1;border-radius:5px;border:1px solid var(--line);font-family:var(--mono);font-size:10.5px;display:grid;place-items:center;color:var(--muted);background:var(--surface)}
+.pal.done{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.pal.flag{border-color:var(--skip);background:var(--skip-bg);color:var(--skip);font-weight:600}
+.pal.cur{outline:2px solid var(--ink);outline-offset:1px}
+.setup{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;box-shadow:var(--shadow)}
+.wtable{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0 4px}
+.wtable th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:0 8px 7px 0;border-bottom:1px solid var(--line)}
+.wtable td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line-soft)}
+.wtable td:last-child,.wtable th:last-child{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.scoreline{display:flex;gap:26px;flex-wrap:wrap;margin:6px 0 20px;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.scoreline div{line-height:1.3}
+.scoreline .n{font-family:var(--mono);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;display:block}
+.scoreline .l{font-size:11.5px;color:var(--muted);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------- fact sheets ---------- */
+.facts{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 4px;box-shadow:var(--shadow)}
+.facts ol{margin:0;padding:0 20px 8px 44px}
+.facts li{padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px;line-height:1.58}
+.facts li:last-child{border-bottom:none}
+.facts li::marker{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+.docs{display:flex;flex-direction:column;gap:14px}
+.docsub{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.docsub-h{display:flex;align-items:center;gap:9px;padding:10px 16px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+.docsub-h .code{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--indigo);background:var(--indigo-soft);border-radius:3px;padding:2px 5px;min-width:29px;text-align:center}
+.docsub-h .nm{font-size:13.5px;font-weight:600;line-height:1.3}
+.doc{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line-soft);color:inherit;text-decoration:none}
+.doc:first-of-type{border-top:none}
+.doc:hover{background:var(--surface-2)}
+.doc .ic{width:26px;height:26px;flex:none;border-radius:5px;display:grid;place-items:center;font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.02em;border:1px solid var(--line);color:var(--muted)}
+.doc .kd{flex:1;min-width:0;font-size:14px;line-height:1.35}
+.doc .kd small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc .sz{flex:none;white-space:nowrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty p{font-size:14px;margin:8px 0 0}
+.note{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.55}
+.railtoggle{display:none}
+.railscrim{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .railscrim{display:block;position:fixed;inset:var(--mh) 0 0 0;background:rgba(8,11,18,.5);z-index:24;opacity:0;pointer-events:none;transition:opacity .18s}
+  .railscrim.on{opacity:1;pointer-events:auto}
+  .rail{position:fixed;inset:var(--mh) auto 0 0;width:min(300px,84vw);z-index:25;transform:translateX(-101%);transition:transform .18s;box-shadow:var(--shadow);max-height:none;height:calc(100vh - var(--mh));height:calc(100dvh - var(--mh))}
+  .rail.open{transform:none}
+  .railtoggle{display:grid}
+  .work{padding:20px 16px 70px}
+}
+@media (max-width:600px){
+  .mast-in{gap:10px;row-gap:9px;padding:9px 14px}
+  .brand{gap:8px;min-width:0}
+  .brand h1{font-size:15px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand .stamp{display:none}          /* the countdown already carries the date */
+  .countdown{order:2;display:flex;align-items:baseline;gap:4px;font-size:11px;text-align:left}
+  .countdown b{display:inline;font-size:14px}
+  .countdown .cdlbl{display:none}
+  .countdown::after{content:"days left"}
+  #theme{order:3}
+  .modes{order:5;flex:1 0 100%}
+  .modes button{flex:1;padding:8px 2px;font-size:12px;text-align:center;letter-spacing:-.01em}
+  .chip{padding:7px 12px}              /* thumbs, not cursors */
+  .palette{grid-template-columns:repeat(auto-fill,minmax(34px,1fr))}
+  .h2{font-size:21px}
+  .stem{font-size:16.5px}
+}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <button class="icobtn railtoggle" id="railtoggle" aria-label="Chapters">☰</button>
+    <div class="brand">
+      <h1>RAS Prelims Drill Room</h1>
+      <span class="stamp">RPSC · 6 Dec 2026</span>
+    </div>
+    <nav class="modes" role="group" aria-label="Mode">
+      <button data-mode="practice" aria-pressed="true">Practice</button>
+      <button data-mode="mock" aria-pressed="false">Mock test</button>
+      <button data-mode="facts" aria-pressed="false">Fact sheets</button>
+      <button data-mode="notes" aria-pressed="false">Notes</button>
+    </nav>
+    <div class="countdown"><b id="dleft">—</b><span class="cdlbl">days to the paper</span></div>
+    <button class="icobtn" id="theme" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <div class="k">Attempted</div>
+      <div class="overall"><b id="ovn">0</b><span id="ovt">of 5,395</span></div>
+      <div class="bar"><i id="ovbar" style="width:0%"></i></div>
+    </div>
+    <div id="tree"></div>
+  </aside>
+  <div class="railscrim" id="railscrim"></div>
+  <main class="work"><div class="col" id="view"></div></main>
+</div>
+
+<script>
+const BANK = __BANK__;
+const DOCS = __DOCS__;   // the PDFs, keyed by subject code; see build.py
+
+/* ---------- state ---------- */
+const KEY = "ras2026.v1";
+let store = { seen:{}, mock:null };      // seen[qid] = 1 correct | 0 wrong
+try { const r = localStorage.getItem(KEY); if (r) store = Object.assign(store, JSON.parse(r)); } catch(e){}
+
+// Progress is per-browser. localStorage survives closing the tab and rebooting the phone;
+// it does not travel between devices, and a private window keeps its own copy.
+function persist(){
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
+}
+
+/* ---------- index ---------- */
+const CH = {}, ALLQ = [];
+BANK.subjects.forEach(s => s.chapters.forEach(c => {
+  c.subject = s.subject; c.subject_code = s.code; CH[c.code] = c;
+  c.questions.forEach(q => { q.ch = c.code; ALLQ.push(q); });
+}));
+const N = ALLQ.length;
+
+/* Real RAS Prelims weightage, averaged over the 2013-2024 papers (see RESEARCH digest). */
+const WEIGHT = [["RH",14],["IH",11],["WG",3],["IG",5],["RG",13],["IP",11],
+                ["RP",12],["IE",8],["RE",11],["ST",20],["RM",20],["CA",22]];
+
+let mode = "practice", curCh = BANK.subjects[0].chapters[0].code;
+let filter = "all", queue = [], qi = 0, picked = null, sess = {ok:0,bad:0};
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const LET = ["A","B","C","D"];
+
+/* ---------- countdown ---------- */
+(function(){
+  const d = Math.ceil((new Date("2026-12-06T09:00:00+05:30") - new Date())/864e5);
+  $("#dleft").textContent = d > 0 ? d : "0";
+})();
+
+/* ---------- rail ---------- */
+function chStat(c){
+  let done=0, ok=0;
+  c.questions.forEach(q => { const v = store.seen[q.id]; if (v !== undefined){ done++; if (v===1) ok++; } });
+  return {done, ok, tot:c.questions.length};
+}
+function renderTree(){
+  let seen = 0; for (const k in store.seen) seen++;
+  $("#ovn").textContent = seen.toLocaleString("en-IN");
+  $("#ovt").textContent = "of " + N.toLocaleString("en-IN");
+  $("#ovbar").style.width = (seen/N*100).toFixed(1) + "%";
+  $("#tree").innerHTML = BANK.subjects.map(s => {
+    const tot = s.chapters.reduce((a,c)=>a+c.questions.length,0);
+    const open = s.chapters.some(c => c.code === curCh);
+    return `<section class="subj">
+      <button data-subj="${s.code}" aria-expanded="${open}">
+        <span class="code">${s.code}</span><span class="nm">${esc(s.subject)}</span><span class="ct">${tot}</span>
+      </button>
+      <div class="chaps" ${open?"":"hidden"}>${s.chapters.map(c=>{
+        const st = chStat(c);
+        return `<button class="chap" data-ch="${c.code}" aria-current="${c.code===curCh}">
+          <span class="cc">${c.code}</span><span class="ct2">${esc(c.title)}</span>
+          <span class="pg">${st.done}/${st.tot}</span>
+          ${st.done?`<span class="minibar"><i style="width:${st.done/st.tot*100}%"></i></span>`:""}
+        </button>`;}).join("")}</div>
+    </section>`;
+  }).join("");
+  $("#tree").querySelectorAll("[data-subj]").forEach(b => b.onclick = () => {
+    const box = b.nextElementSibling; box.hidden = !box.hidden; b.setAttribute("aria-expanded", !box.hidden);
+  });
+  $("#tree").querySelectorAll("[data-ch]").forEach(b => b.onclick = () => {
+    curCh = b.dataset.ch; qi = 0; picked = null; sess = {ok:0,bad:0};
+    if (mode === "mock") setMode("practice"); else { renderTree(); render(); }
+    setRail(false);
+  });
+}
+
+/* ---------- practice ---------- */
+function buildQueue(){
+  const c = CH[curCh];
+  queue = c.questions.filter(q => {
+    if (filter === "pyq") return !!q.pyq;
+    if (filter === "hard") return q.diff === "H";
+    if (filter === "new")  return store.seen[q.id] === undefined;
+    if (filter === "wrong") return store.seen[q.id] === 0;
+    return true;
+  });
+}
+function renderPractice(){
+  const c = CH[curCh];
+  buildQueue();
+  if (qi >= queue.length) qi = Math.max(0, queue.length - 1);
+  const st = chStat(c);
+  const head = `<div class="crumb">${c.subject_code} · ${esc(c.subject)}</div>
+    <h2 class="h2">${c.code} — ${esc(c.title)}</h2>
+    <p class="sub">${st.tot} questions · ${st.done} attempted · ${st.done? Math.round(st.ok/st.done*100):0}% correct so far</p>
+    <div class="filters">
+      ${[["all","All"],["new","Unattempted"],["wrong","Got wrong"],["pyq","Asked in RAS before"],["hard","Hard only"]]
+        .map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${filter===k}">${l}</button>`).join("")}
+    </div>`;
+  if (!queue.length){
+    $("#view").innerHTML = head + `<div class="empty"><strong>Nothing here.</strong><p>No questions in this chapter match that filter.</p></div>`;
+    bindChips(); return;
+  }
+  const q = queue[qi], revealed = picked !== null;
+  $("#view").innerHTML = head + `
+    <div class="qcard">
+      <div class="qtop">
+        <span class="qnum">Q ${qi+1} / ${queue.length}</span>
+        <span class="tag d-${q.diff}">${({E:"Easy",M:"Moderate",H:"Hard"})[q.diff]}</span>
+        ${q.pyq?`<span class="tag pyq">${esc(q.pyq)}</span>`:""}
+        ${q.repeat?`<span class="tag rep">Repeat</span>`:""}
+        ${(q.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}
+        <span class="spacer tally">Session <b class="ok">${sess.ok}</b> · <b class="bad">${sess.bad}</b></span>
+      </div>
+      <div class="qbody"><p class="stem">${esc(q.q)}</p></div>
+      <div class="opts">${q.opts.map((o,i)=>{
+        let cls = "opt";
+        if (revealed){ if (i===q.ans) cls+=" correct"; else if (i===picked) cls+=" wrong"; if(i===picked) cls+=" picked"; }
+        return `<button class="${cls}" data-o="${i}" ${revealed?"disabled":""}>
+          <span class="lt">${LET[i]}</span><span class="tx">${esc(o)}</span></button>`;
+      }).join("")}</div>
+      ${revealed?`<div class="exp"><span class="lbl">Why</span>${esc(q.exp)}</div>`:""}
+      <div class="qfoot">
+        <button class="btn" id="prev" ${qi===0?"disabled":""}>← Previous</button>
+        ${revealed?`<button class="btn pri" id="next">${qi===queue.length-1?"Finish":"Next question →"}</button>`
+                  :`<button class="btn" id="skip">Skip</button>`}
+        <span class="spacer tally">${q.ch} · #${q.id}</span>
+      </div>
+    </div>`;
+  bindChips();
+  $("#view").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    picked = +b.dataset.o;
+    const right = picked === q.ans;
+    if (store.seen[q.id] === undefined){ right ? sess.ok++ : sess.bad++; }
+    store.seen[q.id] = right ? 1 : 0;
+    persist(); renderTree(); renderPractice();
+  });
+  const nx = $("#next"), pv = $("#prev"), sk = $("#skip");
+  if (nx) nx.onclick = () => { picked=null; if(qi<queue.length-1) qi++; renderPractice(); };
+  if (sk) sk.onclick = () => { picked=null; if(qi<queue.length-1){qi++; renderPractice();} };
+  if (pv) pv.onclick = () => { picked=null; if(qi>0) qi--; renderPractice(); };
+}
+function bindChips(){
+  $("#view").querySelectorAll("[data-f]").forEach(b => b.onclick = () => {
+    filter = b.dataset.f; qi = 0; picked = null; renderPractice();
+  });
+}
+
+/* ---------- mock test ---------- */
+const MARK = 200/150, PEN = MARK/3;
+function composeMock(){
+  const bySub = {};
+  BANK.subjects.forEach(s => bySub[s.code] = s.chapters.flatMap(c => c.questions));
+  const out = [];
+  WEIGHT.forEach(([code,n]) => {
+    const pool = (bySub[code]||[]).slice();
+    for (let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    out.push(...pool.slice(0,n).map(q=>q.id));
+  });
+  while (out.length < 150){
+    const q = ALLQ[Math.floor(Math.random()*N)];
+    if (!out.includes(q.id)) out.push(q.id);
+  }
+  return out.slice(0,150);
+}
+const byId = {}; ALLQ.forEach(q => byId[q.id] = q);
+let tick = null;
+function startMock(){
+  store.mock = { ids: composeMock(), ans:{}, flag:{}, i:0, ends: Date.now()+180*60*1000, done:false };
+  persist(); renderMock();
+}
+function renderMock(){
+  const m = store.mock;
+  if (!m){
+    $("#view").innerHTML = `<div class="crumb">Full-length paper</div>
+      <h2 class="h2">Sit a 150-question mock</h2>
+      <p class="sub">Composed to the real weightage of the RAS Prelims papers, 2013 to 2024.</p>
+      <div class="setup">
+        <table class="wtable"><thead><tr><th>Subject</th><th>Questions</th></tr></thead><tbody>
+        ${WEIGHT.map(([c,n])=>{const s=BANK.subjects.find(x=>x.code===c);
+          return `<tr><td>${esc(s.subject)}</td><td>${n}</td></tr>`;}).join("")}
+        <tr><td><strong>Total</strong></td><td><strong>150</strong></td></tr></tbody></table>
+        <p class="note">200 marks · 3 hours · every wrong answer costs one third of a question's marks, exactly as RPSC scores it. Questions are drawn at random, so each attempt is a fresh paper. Your attempt is saved if you close the tab.</p>
+        <div style="margin-top:16px"><button class="btn pri" id="startmock">Start the paper</button></div>
+      </div>`;
+    $("#startmock").onclick = startMock; return;
+  }
+  if (m.done) return renderResult();
+  const q = byId[m.ids[m.i]], chosen = m.ans[q.id];
+  const left = Math.max(0, m.ends - Date.now()), mm = Math.floor(left/60000), ss = Math.floor(left%60000/1000);
+  const answered = Object.keys(m.ans).length;
+  $("#view").innerHTML = `
+    <div class="mockbar">
+      <div><span class="clock ${left<300000?"low":""}" id="clk">${String(Math.floor(mm/60)).padStart(2,"0")}:${String(mm%60).padStart(2,"0")}:${String(ss).padStart(2,"0")}</span></div>
+      <div class="meta">${answered} of 150 answered<br>${150-answered} left</div>
+      <span class="spacer"></span>
+      <button class="btn" id="flag">${m.flag[q.id]?"Unflag":"Flag for review"}</button>
+      <button class="btn pri" id="submit">Submit paper</button>
+    </div>
+    <div class="qcard">
+      <div class="qtop"><span class="qnum">Q ${m.i+1} / 150</span>
+        <span class="tag">${q.ch}</span>
+        <span class="spacer tally">${MARK.toFixed(2)} marks · −${PEN.toFixed(2)} if wrong</span></div>
+      <div class="qbody"><p class="stem">${esc(q.q)}</p></div>
+      <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${chosen===i?"picked correct":""}" data-o="${i}">
+        <span class="lt">${LET[i]}</span><span class="tx">${esc(o)}</span></button>`).join("")}</div>
+      <div class="qfoot">
+        <button class="btn" id="mprev" ${m.i===0?"disabled":""}>← Previous</button>
+        <button class="btn" id="mclear">Clear choice</button>
+        <button class="btn pri spacer" id="mnext" ${m.i===149?"disabled":""}>Next →</button>
+      </div>
+    </div>
+    <div class="palette" id="pal">${m.ids.map((id,i)=>`<button class="pal ${m.ans[id]!==undefined?"done":""} ${m.flag[id]?"flag":""} ${i===m.i?"cur":""}" data-i="${i}">${i+1}</button>`).join("")}</div>`;
+  $("#view").querySelectorAll(".opt").forEach(b => b.onclick = () => { m.ans[q.id] = +b.dataset.o; persist(); renderMock(); });
+  $("#mclear").onclick = () => { delete m.ans[q.id]; persist(); renderMock(); };
+  $("#mprev").onclick = () => { m.i--; renderMock(); };
+  $("#mnext").onclick = () => { m.i++; renderMock(); };
+  $("#flag").onclick  = () => { m.flag[q.id] = !m.flag[q.id]; persist(); renderMock(); };
+  $("#submit").onclick = () => { if (confirm("Submit the paper and see your score?")) finishMock(); };
+  $("#pal").querySelectorAll(".pal").forEach(b => b.onclick = () => { m.i = +b.dataset.i; renderMock(); });
+  clearInterval(tick);
+  tick = setInterval(() => {
+    const l = Math.max(0, store.mock.ends - Date.now()); const c = $("#clk"); if (!c) return clearInterval(tick);
+    const M = Math.floor(l/60000), S = Math.floor(l%60000/1000);
+    c.textContent = `${String(Math.floor(M/60)).padStart(2,"0")}:${String(M%60).padStart(2,"0")}:${String(S).padStart(2,"0")}`;
+    c.classList.toggle("low", l < 300000);
+    if (l <= 0){ clearInterval(tick); finishMock(); }
+  }, 1000);
+}
+function finishMock(){
+  clearInterval(tick);
+  const m = store.mock; m.done = true;
+  m.ids.forEach(id => { const a = m.ans[id]; if (a !== undefined) store.seen[id] = (a === byId[id].ans) ? 1 : 0; });
+  persist(); renderTree(); renderResult();
+}
+function renderResult(){
+  const m = store.mock;
+  let ok=0, bad=0, skip=0;
+  m.ids.forEach(id => { const a = m.ans[id]; if (a===undefined) skip++; else if (a===byId[id].ans) ok++; else bad++; });
+  const marks = ok*MARK - bad*PEN;
+  const subj = {};
+  m.ids.forEach(id => { const c = byId[id].ch.slice(0,2); (subj[c] = subj[c] || {ok:0,n:0}); subj[c].n++; if (m.ans[id]===byId[id].ans) subj[c].ok++; });
+  $("#view").innerHTML = `<div class="crumb">Result</div><h2 class="h2">Paper submitted</h2>
+    <p class="sub">RAS-2024 cut-offs for reference: General ~100–102, OBC ~100–102, ST ~94–96, SC ~92–94.</p>
+    <div class="scoreline">
+      <div><span class="n">${marks.toFixed(1)}</span><span class="l">Marks / 200</span></div>
+      <div><span class="n" style="color:var(--ok)">${ok}</span><span class="l">Correct</span></div>
+      <div><span class="n" style="color:var(--bad)">${bad}</span><span class="l">Wrong</span></div>
+      <div><span class="n" style="color:var(--muted)">${skip}</span><span class="l">Not attempted</span></div>
+      <div><span class="n">${ok+bad?Math.round(ok/(ok+bad)*100):0}%</span><span class="l">Accuracy</span></div>
+    </div>
+    <table class="wtable"><thead><tr><th>Subject</th><th>Correct</th></tr></thead><tbody>
+      ${WEIGHT.map(([c])=>{const s=BANK.subjects.find(x=>x.code===c), d=subj[c]||{ok:0,n:0};
+        return `<tr><td>${esc(s.subject)}</td><td>${d.ok} / ${d.n}</td></tr>`;}).join("")}
+    </tbody></table>
+    <p class="note">Every question you answered is now recorded in the chapter tree — switch to Practice and use the “Got wrong” filter to work through your mistakes.</p>
+    <div style="margin-top:16px"><button class="btn pri" id="again">Take a fresh paper</button>
+    <button class="btn" id="review">Review this paper</button></div>`;
+  $("#again").onclick = () => { store.mock = null; persist(); renderMock(); };
+  $("#review").onclick = () => {
+    const wrong = m.ids.filter(id => m.ans[id] !== undefined && m.ans[id] !== byId[id].ans).map(id => byId[id]);
+    $("#view").innerHTML = `<div class="crumb">Review</div><h2 class="h2">The ${wrong.length} you got wrong</h2>
+      <p class="sub">Each one with the correct answer and the reason.</p>` +
+      (wrong.length ? wrong.map(q => `<div class="qcard" style="margin-bottom:14px">
+        <div class="qtop"><span class="tag">${q.ch}</span>${q.pyq?`<span class="tag pyq">${esc(q.pyq)}</span>`:""}</div>
+        <div class="qbody"><p class="stem">${esc(q.q)}</p></div>
+        <div class="opts">${q.opts.map((o,i)=>`<div class="opt ${i===q.ans?"correct":(i===m.ans[q.id]?"wrong":"")}">
+          <span class="lt">${LET[i]}</span><span class="tx">${esc(o)}</span></div>`).join("")}</div>
+        <div class="exp"><span class="lbl">Why</span>${esc(q.exp)}</div></div>`).join("")
+       : `<div class="empty"><strong>Nothing wrong.</strong><p>Every question you attempted was correct.</p></div>`) +
+      `<div style="margin-top:16px"><button class="btn" id="back">← Back to the result</button></div>`;
+    $("#back").onclick = renderResult;
+  };
+}
+
+/* ---------- fact sheets ---------- */
+function renderFacts(){
+  const c = CH[curCh];
+  $("#view").innerHTML = `<div class="crumb">${c.subject_code} · ${esc(c.subject)}</div>
+    <h2 class="h2">${c.code} — ${esc(c.title)}</h2>
+    <p class="sub">${c.factsheet.length} must-know facts for last-week revision.</p>
+    <div class="facts"><ol>${c.factsheet.map(f=>`<li>${esc(f)}</li>`).join("")}</ol></div>
+    <p class="note">Pick another chapter from the left to read its sheet.</p>`;
+}
+
+/* ---------- notes ---------- */
+function renderNotes(){
+  const groups = BANK.subjects.map(s => [s, DOCS[s.code] || []]).filter(([,d]) => d.length);
+  const total = groups.reduce((a,[,d]) => a + d.length, 0);
+  if (!total){
+    $("#view").innerHTML = `<div class="crumb">Reference</div><h2 class="h2">Notes</h2>
+      <div class="empty"><strong>No PDFs bundled.</strong><p>Run build.py with the PDF folders in place.</p></div>`;
+    return;
+  }
+  $("#view").innerHTML = `<div class="crumb">Reference</div>
+    <h2 class="h2">Notes &amp; question banks</h2>
+    <p class="sub">${total} PDFs, one pair per subject. They open in your phone's PDF reader.</p>
+    <div class="docs">${groups.map(([s,docs]) => `
+      <section class="docsub">
+        <div class="docsub-h"><span class="code">${s.code}</span><span class="nm">${esc(s.subject)}</span></div>
+        ${docs.map(d => `<a class="doc" href="${encodeURI(d.href)}" target="_blank" rel="noopener">
+          <span class="ic">PDF</span>
+          <span class="kd">${esc(d.kind)}<small>${esc(d.file)}</small></span>
+          <span class="sz">${d.mb} MB</span>
+        </a>`).join("")}
+      </section>`).join("")}</div>
+    <p class="note">These are downloaded fresh each time rather than stored on the device — all
+      ${groups.reduce((a,[,d])=>a+d.reduce((x,y)=>x+ +y.mb,0),0).toFixed(0)} MB of them would be a lot to keep offline.
+      The practice questions themselves work with no signal.</p>`;
+}
+
+/* ---------- routing ---------- */
+const SCREENS = { practice:renderPractice, mock:renderMock, facts:renderFacts, notes:renderNotes };
+function render(){ (SCREENS[mode] || renderPractice)(); }
+function setMode(m){
+  mode = m; picked = null;
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode===m));
+  clearInterval(tick); render();
+}
+document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+(function(){
+  const mast = document.querySelector(".mast");
+  const sync = () => document.documentElement.style.setProperty("--mh", mast.offsetHeight + "px");
+  sync();
+  addEventListener("resize", sync);
+  if (window.ResizeObserver) new ResizeObserver(sync).observe(mast);
+  addEventListener("load", sync);          // web fonts land after first paint and change the height
+})();
+function setRail(open){
+  $("#rail").classList.toggle("open", open);
+  document.getElementById("railscrim").classList.toggle("on", open);
+}
+$("#railtoggle").onclick = () => setRail(!$("#rail").classList.contains("open"));
+document.getElementById("railscrim").onclick = () => setRail(false);
+$("#theme").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+};
+document.addEventListener("keydown", e => {
+  if (mode!=="practice" || e.target.tagName==="INPUT") return;
+  if (["1","2","3","4"].includes(e.key)){ const b=$("#view").querySelector(`.opt[data-o="${+e.key-1}"]`); if(b&&!b.disabled) b.click(); }
+  if (e.key==="Enter" || e.key==="ArrowRight"){ const b=$("#next")||$("#skip"); if(b) b.click(); }
+  if (e.key==="ArrowLeft"){ const b=$("#prev"); if(b&&!b.disabled) b.click(); }
+});
+renderTree(); render();
+
+/* Cached for offline use: after the first visit the 3.5 MB page loads from the phone,
+   not the network, so it opens instantly and works with no signal. */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
